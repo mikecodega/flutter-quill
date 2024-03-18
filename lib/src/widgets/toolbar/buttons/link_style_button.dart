@@ -211,6 +211,7 @@ class _LinkDialog extends StatefulWidget {
     this.text,
     this.linkRegExp,
     this.action,
+    this.linkPrefixes,
   });
 
   final QuillDialogTheme? dialogTheme;
@@ -218,6 +219,7 @@ class _LinkDialog extends StatefulWidget {
   final String? text;
   final RegExp? linkRegExp;
   final LinkDialogAction? action;
+  final List<String>? linkPrefixes;
 
   @override
   _LinkDialogState createState() => _LinkDialogState();
@@ -329,11 +331,21 @@ class _LinkDialogState extends State<_LinkDialog> {
     if (_text.isEmpty || _link.isEmpty) {
       return false;
     }
-    if (!linkRegExp.hasMatch(_link)) {
+    if (!_linkMatchesSupportedPrefix(_link)) {
       return false;
     }
 
     return true;
+  }
+
+  bool _linkMatchesSupportedPrefix(String link) {
+    for (final prefix in widget.linkPrefixes ?? <String>[]) {
+      if (link.startsWith(prefix) || linkRegExp.hasMatch(_link)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   void _linkChanged(String value) {
